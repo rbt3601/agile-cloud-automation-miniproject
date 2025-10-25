@@ -76,7 +76,7 @@
  def cred = new Properties()
  
  if (!credFile.exists()) {
-	 println "mongo.properties file not found!"
+	 println "properties file not found!"
 	 System.exit(1)
  }
  
