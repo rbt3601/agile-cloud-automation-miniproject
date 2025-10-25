@@ -59,6 +59,7 @@
 
  /**
   * DataPreparation_SplitAndUpload.groovy
+  * done with
   *
   * Reads a large Azure cost CSV (96k records),
   * extracts 40k subset, saves as JSON, and uploads to MongoDB Atlas.
