@@ -44,3 +44,4 @@
  * Understand how Groovy can simulate NoSQL query operations for
  * analyzing cloud cost data locally.
  */
+

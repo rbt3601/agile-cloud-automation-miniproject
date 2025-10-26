@@ -13,6 +13,8 @@ dependencies {
     implementation 'org.apache.groovy:groovy-xml:4.0.21'
     implementation 'org.mongodb:mongodb-driver-sync:5.1.0'
     implementation 'org.slf4j:slf4j-nop:2.0.9'
+	
+	
 }
 application {
     //mainClass = 'Exercise2_GroovyAnalysis'

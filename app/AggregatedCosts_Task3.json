@@ -1,0 +1,498 @@
+[
+    {
+        "TotalCost": 694.7111875673705,
+        "AverageCost": 0.03715827918096762,
+        "ExampleCost": 0.021624860495606,
+        "ServiceName": "Storage",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-30"
+    },
+    {
+        "TotalCost": 531.0574759338364,
+        "AverageCost": 0.2861301055677998,
+        "ExampleCost": 0.028192243814444,
+        "ServiceName": "Virtual Machines",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-26"
+    },
+    {
+        "TotalCost": 442.55151937288576,
+        "AverageCost": 2.6032442316052102,
+        "ExampleCost": 1.4231300044449553,
+        "ServiceName": "Application Gateway",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-22"
+    },
+    {
+        "TotalCost": 317.8756936653565,
+        "AverageCost": 1.1114534743543933,
+        "ExampleCost": 0.729354838709677,
+        "ServiceName": "Virtual Machines",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-27"
+    },
+    {
+        "TotalCost": 224.7234235007967,
+        "AverageCost": 1.3219024911811572,
+        "ExampleCost": 0.03,
+        "ServiceName": "Azure Database for MySQL",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-29"
+    },
+    {
+        "TotalCost": 213.1627463757892,
+        "AverageCost": 0.04163334890152133,
+        "ExampleCost": 0.003699950503539,
+        "ServiceName": "Virtual Network",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-25"
+    },
+    {
+        "TotalCost": 192.58514431504983,
+        "AverageCost": 0.29268259014445264,
+        "ExampleCost": 0.0,
+        "ServiceName": "Azure App Service",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-28"
+    },
+    {
+        "TotalCost": 164.42485576903627,
+        "AverageCost": 0.03977379191316794,
+        "ExampleCost": 0.018599832635028,
+        "ServiceName": "Load Balancer",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-31"
+    },
+    {
+        "TotalCost": 148.68176789873067,
+        "AverageCost": 0.02879197674258921,
+        "ExampleCost": 4.256956077E-6,
+        "ServiceName": "Storage",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-31"
+    },
+    {
+        "TotalCost": 128.8223122829454,
+        "AverageCost": 2.077779230370087,
+        "ExampleCost": 2.145570459207827,
+        "ServiceName": "Security Center",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-31"
+    },
+    {
+        "TotalCost": 126.48940092165903,
+        "AverageCost": 1.171198156682028,
+        "ExampleCost": 1.171198156682028,
+        "ServiceName": "API Management",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-27"
+    },
+    {
+        "TotalCost": 116.7711776518594,
+        "AverageCost": 1.1227997851140328,
+        "ExampleCost": 0.957365591397849,
+        "ServiceName": "Azure DevOps",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-25"
+    },
+    {
+        "TotalCost": 115.19999999999999,
+        "AverageCost": 5.76,
+        "ExampleCost": 5.76,
+        "ServiceName": "Unassigned",
+        "Region": "Unassigned",
+        "ExampleDate": "2022-12-31"
+    },
+    {
+        "TotalCost": 109.69443251010021,
+        "AverageCost": 0.175230722859585,
+        "ExampleCost": 0.23856,
+        "ServiceName": "Advanced Threat Protection",
+        "Region": "Unassigned",
+        "ExampleDate": "2023-01-22"
+    },
+    {
+        "TotalCost": 97.87691170496227,
+        "AverageCost": 5.437606205831237,
+        "ExampleCost": 7.033188485594188,
+        "ServiceName": "Azure Firewall",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-14"
+    },
+    {
+        "TotalCost": 76.66589610823705,
+        "AverageCost": 0.36507569575350973,
+        "ExampleCost": 0.123330857724462,
+        "ServiceName": "Container Registry",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-27"
+    },
+    {
+        "TotalCost": 62.757273772198225,
+        "AverageCost": 0.9805824026905973,
+        "ExampleCost": 0.715190153069276,
+        "ServiceName": "Security Center",
+        "Region": "Unassigned",
+        "ExampleDate": "2022-12-24"
+    },
+    {
+        "TotalCost": 49.95770585846892,
+        "AverageCost": 0.24731537553697486,
+        "ExampleCost": 0.216118561731112,
+        "ServiceName": "Backup",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-29"
+    },
+    {
+        "TotalCost": 37.66,
+        "AverageCost": 3.138333333333333,
+        "ExampleCost": 4.032,
+        "ServiceName": "Redis Cache",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-22"
+    },
+    {
+        "TotalCost": 36.887602743215794,
+        "AverageCost": 0.05799937538241477,
+        "ExampleCost": 0.001365898394223,
+        "ServiceName": "Virtual Network",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-29"
+    },
+    {
+        "TotalCost": 34.70270967741418,
+        "AverageCost": 0.598322580645072,
+        "ExampleCost": 0.598322580645072,
+        "ServiceName": "Azure Site Recovery",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-25"
+    },
+    {
+        "TotalCost": 34.42979454229006,
+        "AverageCost": 0.10826979415814485,
+        "ExampleCost": 2.0311996658E-4,
+        "ServiceName": "Logic Apps",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-22"
+    },
+    {
+        "TotalCost": 29.642607333552903,
+        "AverageCost": 0.24297219125863034,
+        "ExampleCost": 0.060181268882175,
+        "ServiceName": "Azure Database for MySQL",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-24"
+    },
+    {
+        "TotalCost": 28.773613935566946,
+        "AverageCost": 0.2714491880713863,
+        "ExampleCost": 0.038855968528381,
+        "ServiceName": "Backup",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-26"
+    },
+    {
+        "TotalCost": 28.38177754041566,
+        "AverageCost": 0.021632452393609496,
+        "ExampleCost": 0.022237726098191,
+        "ServiceName": "Azure Front Door Service",
+        "Region": "All Regions",
+        "ExampleDate": "2022-12-27"
+    },
+    {
+        "TotalCost": 25.08665632485047,
+        "AverageCost": 0.23228385485972658,
+        "ExampleCost": 0.002646365430941,
+        "ServiceName": "Load Balancer",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-23"
+    },
+    {
+        "TotalCost": 18.669138734242154,
+        "AverageCost": 0.22225165159812088,
+        "ExampleCost": 0.359005323808882,
+        "ServiceName": "Advanced Data Security",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-29"
+    },
+    {
+        "TotalCost": 17.311574436714178,
+        "AverageCost": 0.2545819770105026,
+        "ExampleCost": 1.067974388448487,
+        "ServiceName": "Virtual Machines Licenses",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-18"
+    },
+    {
+        "TotalCost": 14.648180684096019,
+        "AverageCost": 1.8310225855120024,
+        "ExampleCost": 0.072131144292143,
+        "ServiceName": "Virtual Machines",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 13.197900401282139,
+        "AverageCost": 0.31423572384005094,
+        "ExampleCost": 8.93694545E-6,
+        "ServiceName": "Log Analytics",
+        "Region": "EastUS",
+        "ExampleDate": "2022-12-31"
+    },
+    {
+        "TotalCost": 11.24603722906927,
+        "AverageCost": 0.21626994671287056,
+        "ExampleCost": 0.188082235444114,
+        "ServiceName": "Service Bus",
+        "Region": "All Regions",
+        "ExampleDate": "2022-12-23"
+    },
+    {
+        "TotalCost": 10.4853125,
+        "AverageCost": 0.8737760416666666,
+        "ExampleCost": 0.29203125,
+        "ServiceName": "Azure Defender",
+        "Region": "Unassigned",
+        "ExampleDate": "2023-01-17"
+    },
+    {
+        "TotalCost": 9.756494845360825,
+        "AverageCost": 0.9756494845360825,
+        "ExampleCost": 1.850721649484536,
+        "ServiceName": "Azure Database for PostgreSQL",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-22"
+    },
+    {
+        "TotalCost": 8.510744292369912,
+        "AverageCost": 0.015530555278047285,
+        "ExampleCost": 3.777460488E-6,
+        "ServiceName": "Storage",
+        "Region": "WestUS",
+        "ExampleDate": "2022-12-24"
+    },
+    {
+        "TotalCost": 8.080270540315482,
+        "AverageCost": 0.05611298986330196,
+        "ExampleCost": 0.1115281725874,
+        "ServiceName": "Log Analytics",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-27"
+    },
+    {
+        "TotalCost": 7.63391519569179,
+        "AverageCost": 0.763391519569179,
+        "ExampleCost": 0.146009193026355,
+        "ServiceName": "Azure Bastion",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-11"
+    },
+    {
+        "TotalCost": 6.892003191428522,
+        "AverageCost": 0.03786814940345341,
+        "ExampleCost": 0.0,
+        "ServiceName": "SQL Database",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-23"
+    },
+    {
+        "TotalCost": 3.994425177996014,
+        "AverageCost": 0.011817825970402408,
+        "ExampleCost": 0.011917769519574,
+        "ServiceName": "Azure DNS",
+        "Region": "All Regions",
+        "ExampleDate": "2022-12-25"
+    },
+    {
+        "TotalCost": 3.628704584755656,
+        "AverageCost": 0.06479829615635099,
+        "ExampleCost": 0.064798503402222,
+        "ServiceName": "Virtual Network",
+        "Region": "WestUS",
+        "ExampleDate": "2022-12-24"
+    },
+    {
+        "TotalCost": 2.543508747334724,
+        "AverageCost": 0.048913629756436997,
+        "ExampleCost": 0.069533271814962,
+        "ServiceName": "Automation",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-25"
+    },
+    {
+        "TotalCost": 2.421339586533656,
+        "AverageCost": 0.605334896633414,
+        "ExampleCost": 0.721196690788621,
+        "ServiceName": "Container Registry",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 2.301366406627498,
+        "AverageCost": 0.164383314759107,
+        "ExampleCost": 0.253677244779792,
+        "ServiceName": "Load Balancer",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 1.140225669032168,
+        "AverageCost": 1.4959665035845814E-4,
+        "ExampleCost": 5.223721E-9,
+        "ServiceName": "Bandwidth",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-30"
+    },
+    {
+        "TotalCost": 0.73911056010676,
+        "AverageCost": 0.06159254667556333,
+        "ExampleCost": 0.081666666666667,
+        "ServiceName": "Storage",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 0.662249492665424,
+        "AverageCost": 0.011825883797596857,
+        "ExampleCost": 0.011924961973973,
+        "ServiceName": "Azure Monitor",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-30"
+    },
+    {
+        "TotalCost": 0.496372680650132,
+        "AverageCost": 6.380111576479846E-4,
+        "ExampleCost": 1.22119179173E-4,
+        "ServiceName": "Bandwidth",
+        "Region": "northeurope",
+        "ExampleDate": "2022-12-28"
+    },
+    {
+        "TotalCost": 0.096199680349232,
+        "AverageCost": 0.048099840174616,
+        "ExampleCost": 0.048099840174616,
+        "ServiceName": "Virtual Network",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 0.050686641013106,
+        "AverageCost": 1.9645984888800775E-4,
+        "ExampleCost": 8.20965723E-7,
+        "ServiceName": "Service Bus",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-30"
+    },
+    {
+        "TotalCost": 0.050144540401148,
+        "AverageCost": 0.0062680675501435,
+        "ExampleCost": 0.003730149427204,
+        "ServiceName": "Automation",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-22"
+    },
+    {
+        "TotalCost": 0.00178237468913,
+        "AverageCost": 8.10170313240909E-5,
+        "ExampleCost": 1.18781442146E-4,
+        "ServiceName": "Key Vault",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-22"
+    },
+    {
+        "TotalCost": 4.28044155178E-4,
+        "AverageCost": 4.2804415517799996E-5,
+        "ExampleCost": 7.78964299E-7,
+        "ServiceName": "Functions",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-16"
+    },
+    {
+        "TotalCost": 5.247557600000001E-7,
+        "AverageCost": 2.3852534545454548E-8,
+        "ExampleCost": 3.2990747E-8,
+        "ServiceName": "Bandwidth",
+        "Region": "All Regions",
+        "ExampleDate": "2022-12-24"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Azure Arc",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-10"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Advanced Threat Protection",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-21"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Advanced Threat Protection",
+        "Region": "WestUS",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Network Watcher",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-29"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Content Delivery Network",
+        "Region": "WestUS",
+        "ExampleDate": "2022-12-31"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Bandwidth",
+        "Region": "southeastasia",
+        "ExampleDate": "2023-01-21"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Azure Arc Enabled Databases",
+        "Region": "westeurope",
+        "ExampleDate": "2023-01-20"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Advanced Threat Protection",
+        "Region": "northeurope",
+        "ExampleDate": "2023-01-21"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Insight and Analytics",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-30"
+    },
+    {
+        "TotalCost": 0.0,
+        "AverageCost": 0.0,
+        "ExampleCost": 0.0,
+        "ServiceName": "Azure Data Factory v2",
+        "Region": "westeurope",
+        "ExampleDate": "2022-12-25"
+    }
+]
