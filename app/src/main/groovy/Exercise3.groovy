@@ -45,3 +45,239 @@
  * cloud cost datasets. Understand how a NoSQL database like MongoDB can
  * enhance scalability and performance compared to local processing.
  */
+
+ import com.mongodb.client.*
+ import org.bson.Document
+ import java.text.SimpleDateFormat
+ 
+ // Created the properties object so that it could read key value pairs from the mongo.properties file
+ def properties = new Properties()
+ 
+ //Created the File object because we need to pass the mongo.properties file location so it points towards the actual mongo.properties file
+ def propertiesFile = new File('src/main/resources/mongo.properties')
+ // We are loading the mongo.properties file inside the properties object
+ propertiesFile.withInputStream { properties.load(it) }
+ 
+ // Connecting to the mongoDB database using MongoClients.create method and passing the values from mongo.properties file
+ def mongoClient = MongoClients.create(
+	 "mongodb+srv://${properties.USN}:${properties.PWD}@${properties.SERVER}.mongodb.net/${properties.DB}?retryWrites=true&w=majority"
+ )
+ // Fetching the database object from the connected client
+ def db  = mongoClient.getDatabase(properties.DB)
+ 
+ // Fetching the database collection object from the connected client
+ def col = db.getCollection(properties.COLLECTION as String)
+ 
+ 
+ // Printing the database object name
+ println "database: ${db.getName()}"
+ 
+ // Printing the database object collection
+ db.listCollectionNames().each { println it }
+ 
+ /* Setting date logic for filtering the dataset
+  Created the Java object through which we are setting the format of the date and once we pass it as
+  a String it can be converted into date object using this class.*/
+ def sdf   = new SimpleDateFormat("MM/dd/yyyy")
+ 
+ // Defining start and end date inside both the steps
+ def start = sdf.parse("12/22/2022")
+ def end   = sdf.parse("01/22/2023")
+ 
+/* Here we are using $addFields which is a stage in mongoDB aggregation to add a new field and "parsedDate"
+   by converting the existing "Date" String into an actual Date object using mongoDB's $DatefromString*/
+ def addDate = new Document("\$addFields",
+   new Document("parsedDate",
+	 new Document("\$dateFromString",
+	   new Document("dateString", "\$Date").append("format","%m/%d/%Y")
+	 )
+   )
+ )
+ /*Here we are filtering the documents where "parsedDate" is between start and end date */
+ def date_filteration = new Document("\$match",
+   new Document("parsedDate", new Document("\$gte", start).append("\$lte", end))
+ )
+ 
+ /*Inside this part we are projecting specific fields from the dataSet */
+ println "\n=== PART 1: Selection (Date, ServiceName, Region, Cost) — first 10 ==="
+ def pipeLine_selection = [
+	 // Here we are using $project to pick /select and rename fields inside the dataSet
+   new Document("\$project",
+	 new Document("_id", 0) //Here we are hiding the "_id" fields we are by default inside the mongoDB
+	 
+	 
+	 
+	 //Here we are selecting the date,serviceNAme,Cost and Region additionally renaming several fields
+	   .append("Date", 1)
+	   .append("ServiceName", "\$MeterCategory")
+	   .append("Region", "\$ResourceLocation")
+	   .append("Cost",
+		 new Document("\$toDouble", // Converting to number
+		   new Document("\$ifNull", ["\$CostInBillingCurrency", "0"]) //If the "Cost" field would be null then make it 0
+		 )
+	   )
+   ),
+   new Document("\$limit", 10) //Here we are limiting only 10 record from the dataSet
+ ]
+ col.aggregate(pipeLine_selection).forEach { println it } //Running the aggregation pipeLine_selection and using forloop to print.
+ 
+ //
+ println "\n=== PART 2: Filtering (22-Dec-2022 to 22-Jan-2023 inclusive) + Selection — first 10 sorted by date ==="
+ def pipeLine_filtering = [
+	 //Here we are adding "parsedDate" and filtering dataSet by Date range and sorting by Date
+   addDate, //It is adding "parsedDate" field from "Date" String
+   date_filteration,
+   new Document("\$project",
+	 new Document("_id", 0)
+	   .append("Date", 1)
+	   .append("ServiceName", "\$MeterCategory")
+	   .append("Region", "\$ResourceLocation")
+	   .append("Cost",
+		 new Document("\$toDouble",
+		   new Document("\$ifNull", ["\$CostInBillingCurrency", "0"])
+		 )
+	   )
+	   .append("parsedDate", 1) //We are keeping this "parsedDate" for sorting
+   ),
+   new Document("\$sort", new Document("parsedDate", 1)), //Sorting in ascending with the help of "parsedDate" field
+   new Document("\$limit", 10)
+ ]
+ col.aggregate(pipeLine_filtering).forEach { println it } // //Running the aggregation pipeLine_filtering and using forloop to print.
+ 
+ 
+ /* This in 3a we have only done grouping of  "ServiceName" and "Region" which i am doing it again in part 3b
+ so if you want grouping differenly without  Aggregation of cost u can uncomment it
+ 
+  */
+ 
+// println "\n=== PART 3A: Grouping ONLY (distinct ServiceName + Region) ==="
+// def pipeLine_groupingOnly = [
+//   addDate,
+//   date_filteration,
+//   new Document("\$project",
+// 	new Document("_id", 0)
+// 	  .append("ServiceName", "\$MeterCategory")
+// 	  .append("Region", "\$ResourceLocation")
+//   ),
+//   new Document("\$group",
+// 	new Document("_id",
+// 	  new Document("ServiceName", "\$ServiceName")
+// 		.append("Region", "\$Region")
+// 	)
+//   ),
+//   new Document("\$sort", new Document("_id.ServiceName", 1).append("_id.Region", 1)),
+//   new Document("\$limit", 50)
+// ]
+// col.aggregate(pipeLine_groupingOnly).forEach { d ->
+//   def id = d.get("_id") as Document
+//   println "${id.getString('ServiceName')} | ${id.getString('Region')}"
+// }
+//
+// 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ println "\n=== PART 3B:  Grouping (ServiceName + Region)  and Aggregation  (TotalCost, AverageCost, Count) ==="
+ // Here we grouping data with fields "serviceName" and "Region" then we are calculating total cost, average cost and count
+ //per (serviceName and Region)
+ def pipeLine_groupingAggregation = [
+   addDate, // Here we added "parsedDate" field from String
+   date_filteration, // Here we are using Date filteration which we have created to filter date from 22 Dec 2022 to 22 Jan 2023
+   new Document("\$project", // Here we are using $project to select (MeterCategory,ResourceLocation,Cost) from dataSet and renaming it to serviceName and Region
+	 new Document("_id", 0) // To hide the mongoDB default "_id"
+	   .append("ServiceName", "\$MeterCategory")
+	   .append("Region", "\$ResourceLocation")
+	   .append("Cost",
+		 new Document("\$toDouble", //Converting to number
+		   new Document("\$ifNull", ["\$CostInBillingCurrency", "0"]) //If Cost is null replace it with 0
+		 )
+	   )
+   ),
+   //Here we are creating 1 output document per (serviceName,Region) pair
+   new Document("\$group",
+	 new Document("_id", // Here we are defining the grouping key
+	   new Document("ServiceName", "\$ServiceName")
+		 .append("Region", "\$Region")
+	 )
+	 //Here we are calculating sum of all cost values for this group / TotalCost
+	 .append("TotalCost",   new Document("\$sum", "\$Cost"))
+	 
+	 //Here we are calculating Average of all cost values for this group / AverageCost
+	 .append("AverageCost", new Document("\$avg", "\$Cost"))
+	 
+	 // Here we are counting documents per group
+	 .append("Count",       new Document("\$sum", 1))
+   ),
+   
+   //Here we are sorting groups alphabetically by serviceName then Region
+   new Document("\$sort", new Document("_id.ServiceName", 1).append("_id.Region", 1)),
+   new Document("\$limit", 50) // Here we are limiting the output to 50 from the dataSet
+ ]
+ //Here we are running the pipeLine and printing results for each group
+ col.aggregate(pipeLine_groupingAggregation).forEach { d ->
+   def id = d.get("_id") as Document //Here we are getting the "_id" object which holds the serviceName and Region
+   
+   
+   //Printing formatted group summary
+   println "[Group=${id.getString('ServiceName')} | ${id.getString('Region')}] " +
+		   "TotalCost=${d.get('TotalCost')}  AverageCost=${d.get('AverageCost')}  Count=${d.get('Count')}"
+ }
+ 
+ //In this Part we are performing the same aggregation but now we are sorting the groups by totalCost
+ // and showing the top 10 most expensive serviceRegion combination
+ println "\n=== PART 4: Sort by TotalCost (desc) + Top 10 ==="
+ def pipeLine_sortingByCost = [
+   addDate,
+   date_filteration,
+   new Document("\$project",
+	 new Document("_id", 0)
+	   .append("Date", 1)
+	   .append("ServiceName", "\$MeterCategory")
+	   .append("Region", "\$ResourceLocation")
+	   .append("Cost",
+		 new Document("\$toDouble",
+		   new Document("\$ifNull", ["\$CostInBillingCurrency", "0"])
+		 )
+	   )
+   ),
+   new Document("\$group",
+	 new Document("_id",
+	   new Document("ServiceName", "\$ServiceName")
+		 .append("Region", "\$Region")
+	 )
+	 .append("TotalCost",   new Document("\$sum", "\$Cost"))
+	 .append("AverageCost", new Document("\$avg", "\$Cost"))
+	 .append("Count",       new Document("\$sum", 1))
+   ),
+   //Here we are sorting by totalCost in a descending order so that top spenders comes first
+   new Document("\$sort", new Document("TotalCost", -1)),
+   new Document("\$limit", 10) // Same limiting the output to 10
+ ]
+ //Printing formatted table header
+ println "ServiceName                   | Region        | TotalCost      | AverageCost    | Count"
+ println "------------------------------------------------------------------------------------------"
+ 
+ //Here we are running pipeLine and printing each row in a formatted columns
+ col.aggregate(pipeLine_sortingByCost).forEach { d ->
+   def k = d.get("_id") as Document
+   
+   //Here we are preparing readable string value which handles null values
+   def svc = (k.get("ServiceName") ?: "").toString()
+   def reg = (k.get("Region") ?: "").toString()
+   def tot = (d.get("TotalCost") as Number).doubleValue()
+   def avg = (d.get("AverageCost") as Number).doubleValue()
+   def cnt = d.get("Count")
+   
+   //Printing rows with aligned columns
+   println "${svc.padRight(28)} | ${reg.padRight(12)} | ${String.format('%.6f', tot).padRight(13)} | ${String.format('%.6f', avg).padRight(13)} | ${cnt}"
+ }
+ println "PART 4 done."
+ 
+ //Here we are closing the connection
+ mongoClient.close()
+ println "Mongo client closed"
+
