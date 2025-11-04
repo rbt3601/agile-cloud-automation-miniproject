@@ -98,8 +98,10 @@
    new Document("parsedDate", new Document("\$gte", start).append("\$lte", end))
  )
  
+ 
+ 
  /*Inside this part we are projecting specific fields from the dataSet */
- println "\n=== PART 1: Selection (Date, ServiceName, Region, Cost) — first 10 ==="
+
  def pipeLine_selection = [
 	 // Here we are using $project to pick /select and rename fields inside the dataSet
    new Document("\$project",
@@ -119,10 +121,8 @@
    ),
    new Document("\$limit", 10) //Here we are limiting only 10 record from the dataSet
  ]
- col.aggregate(pipeLine_selection).forEach { println it } //Running the aggregation pipeLine_selection and using forloop to print.
+
  
- //
- println "\n=== PART 2: Filtering (22-Dec-2022 to 22-Jan-2023 inclusive) + Selection — first 10 sorted by date ==="
  def pipeLine_filtering = [
 	 //Here we are adding "parsedDate" and filtering dataSet by Date range and sorting by Date
    addDate, //It is adding "parsedDate" field from "Date" String
@@ -142,48 +142,13 @@
    new Document("\$sort", new Document("parsedDate", 1)), //Sorting in ascending with the help of "parsedDate" field
    new Document("\$limit", 10)
  ]
- col.aggregate(pipeLine_filtering).forEach { println it } // //Running the aggregation pipeLine_filtering and using forloop to print.
- 
- 
- /* This in 3a we have only done grouping of  "ServiceName" and "Region" which i am doing it again in part 3b
- so if you want grouping differenly without  Aggregation of cost u can uncomment it
- 
-  */
- 
-// println "\n=== PART 3A: Grouping ONLY (distinct ServiceName + Region) ==="
-// def pipeLine_groupingOnly = [
-//   addDate,
-//   date_filteration,
-//   new Document("\$project",
-// 	new Document("_id", 0)
-// 	  .append("ServiceName", "\$MeterCategory")
-// 	  .append("Region", "\$ResourceLocation")
-//   ),
-//   new Document("\$group",
-// 	new Document("_id",
-// 	  new Document("ServiceName", "\$ServiceName")
-// 		.append("Region", "\$Region")
-// 	)
-//   ),
-//   new Document("\$sort", new Document("_id.ServiceName", 1).append("_id.Region", 1)),
-//   new Document("\$limit", 50)
-// ]
-// col.aggregate(pipeLine_groupingOnly).forEach { d ->
-//   def id = d.get("_id") as Document
-//   println "${id.getString('ServiceName')} | ${id.getString('Region')}"
-// }
-//
-// 
+
  
  
  
+
  
- 
- 
- 
- println "\n=== PART 3B:  Grouping (ServiceName + Region)  and Aggregation  (TotalCost, AverageCost, Count) ==="
- // Here we grouping data with fields "serviceName" and "Region" then we are calculating total cost, average cost and count
- //per (serviceName and Region)
+
  def pipeLine_groupingAggregation = [
    addDate, // Here we added "parsedDate" field from String
    date_filteration, // Here we are using Date filteration which we have created to filter date from 22 Dec 2022 to 22 Jan 2023
@@ -217,67 +182,79 @@
    new Document("\$sort", new Document("_id.ServiceName", 1).append("_id.Region", 1)),
    new Document("\$limit", 50) // Here we are limiting the output to 50 from the dataSet
  ]
- //Here we are running the pipeLine and printing results for each group
- col.aggregate(pipeLine_groupingAggregation).forEach { d ->
-   def id = d.get("_id") as Document //Here we are getting the "_id" object which holds the serviceName and Region
-   
-   
-   //Printing formatted group summary
-   println "[Group=${id.getString('ServiceName')} | ${id.getString('Region')}] " +
-		   "TotalCost=${d.get('TotalCost')}  AverageCost=${d.get('AverageCost')}  Count=${d.get('Count')}"
- }
  
  //In this Part we are performing the same aggregation but now we are sorting the groups by totalCost
  // and showing the top 10 most expensive serviceRegion combination
- println "\n=== PART 4: Sort by TotalCost (desc) + Top 10 ==="
+ 
  def pipeLine_sortingByCost = [
-   addDate,
-   date_filteration,
-   new Document("\$project",
-	 new Document("_id", 0)
-	   .append("Date", 1)
-	   .append("ServiceName", "\$MeterCategory")
-	   .append("Region", "\$ResourceLocation")
-	   .append("Cost",
-		 new Document("\$toDouble",
-		   new Document("\$ifNull", ["\$CostInBillingCurrency", "0"])
-		 )
-	   )
-   ),
-   new Document("\$group",
-	 new Document("_id",
-	   new Document("ServiceName", "\$ServiceName")
-		 .append("Region", "\$Region")
-	 )
-	 .append("TotalCost",   new Document("\$sum", "\$Cost"))
-	 .append("AverageCost", new Document("\$avg", "\$Cost"))
-	 .append("Count",       new Document("\$sum", 1))
-   ),
-   //Here we are sorting by totalCost in a descending order so that top spenders comes first
-   new Document("\$sort", new Document("TotalCost", -1)),
-   new Document("\$limit", 10) // Same limiting the output to 10
+	addDate,
+	date_filteration,
+	new Document("\$project",
+	  new Document("_id", 0)
+		.append("Date", 1)
+		.append("ServiceName", "\$MeterCategory")
+		.append("Region", "\$ResourceLocation")
+		.append("Cost",
+		  new Document("\$toDouble",
+			new Document("\$ifNull", ["\$CostInBillingCurrency", "0"])
+		  )
+		)
+	),
+	new Document("\$group",
+	  new Document("_id",
+		new Document("ServiceName", "\$ServiceName")
+		  .append("Region", "\$Region")
+	  )
+	  .append("TotalCost",   new Document("\$sum", "\$Cost"))
+	  .append("AverageCost", new Document("\$avg", "\$Cost"))
+	  .append("Count",       new Document("\$sum", 1))
+	),
+	//Here we are sorting by totalCost in a descending order so that top spenders comes first
+	new Document("\$sort", new Document("TotalCost", -1)),
+	new Document("\$limit", 10) // Same limiting the output to 10
  ]
+ 
  //Printing formatted table header
  println "ServiceName                   | Region        | TotalCost      | AverageCost    | Count"
  println "------------------------------------------------------------------------------------------"
  
  //Here we are running pipeLine and printing each row in a formatted columns
  col.aggregate(pipeLine_sortingByCost).forEach { d ->
-   def k = d.get("_id") as Document
-   
-   //Here we are preparing readable string value which handles null values
-   def svc = (k.get("ServiceName") ?: "").toString()
-   def reg = (k.get("Region") ?: "").toString()
-   def tot = (d.get("TotalCost") as Number).doubleValue()
-   def avg = (d.get("AverageCost") as Number).doubleValue()
-   def cnt = d.get("Count")
-   
-   //Printing rows with aligned columns
-   println "${svc.padRight(28)} | ${reg.padRight(12)} | ${String.format('%.6f', tot).padRight(13)} | ${String.format('%.6f', avg).padRight(13)} | ${cnt}"
+	def k = d.get("_id") as Document
+ 
+	//Here we are preparing readable string value which handles null values
+	def svc = (k.get("ServiceName") ?: "").toString()
+	def reg = (k.get("Region") ?: "").toString()
+	def tot = (d.get("TotalCost") as Number).doubleValue()
+	def avg = (d.get("AverageCost") as Number).doubleValue()
+	def cnt = d.get("Count")
+ 
+	//Printing rows with aligned columns
+	println "${svc.padRight(28)} | ${reg.padRight(12)} | ${String.format('%.6f', tot).padRight(13)} | ${String.format('%.6f', avg).padRight(13)} | ${cnt}"
  }
- println "PART 4 done."
+ 
+ //Here we are extracting the same output in JSON format and saving it into a file
+ import groovy.json.JsonOutput
+ def aggResults = []
+ col.aggregate(pipeLine_sortingByCost).into(aggResults)
+ def rows = aggResults.collect { d ->
+	def k = d.get("_id") as Document
+	def svc = (k.get("ServiceName") ?: "").toString()
+	def reg = (k.get("Region") ?: "").toString()
+	def tot = (d.get("TotalCost") as Number).doubleValue()
+	def avg = (d.get("AverageCost") as Number).doubleValue()
+	def cnt = d.get("Count")
+	[ServiceName: svc, Region: reg, TotalCost: tot, AverageCost: avg, Count: cnt]
+ }
+ 
+ //Creating output directory and saving the JSON file inside src/main/resources/output
+ def outDir = new File("${System.getProperty('user.dir')}/src/main/resources/output")
+ outDir.mkdirs()
+ def jsonFile = new File(outDir, "Exercise-3.json")
+ jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(rows))
+
  
  //Here we are closing the connection
  mongoClient.close()
  println "Mongo client closed"
-
+ 
