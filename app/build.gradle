@@ -21,11 +21,5 @@ dependencies {
 
 
 application {
-    //mainClass = 'Exercise2_GroovyAnalysis'
-	//mainClass = 'SetupMongoDBData'
-	mainClass = 'Exercise2'
-	//mainClass = 'Exercise3_MongoDBAnalysis'
+    mainClass = 'DataPreparation_SplitAndUpload'
 }
-
-
-
