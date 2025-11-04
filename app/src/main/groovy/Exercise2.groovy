@@ -1,46 +1,78 @@
-/**
- * Exercise 2 – Cloud Service Cost Analysis using Groovy
- *
- * Task:
- * -----
- * Using Groovy, perform an analysis of Azure cloud service cost data
- * to identify how different service categories and regions contribute
- * to total cloud spending patterns for the period between
- * 22 December 2022 and 22 January 2023.
- *
- * You need to:
- * 1. Read the Azure cost dataset from "src/main/resources/anonymized_costs.csv".
- * 2. Parse the "Date" field correctly.
- * 3. Filter the records to include only data between 22-Dec-2022 and 22-Jan-2023.
- * 4. Perform the following operations using Groovy collections:
- *       - Selection: Retrieve the required fields (Date, ServiceName, Region, Cost)
- *       - Projection: Keep only these selected fields
- *       - Filtering: Apply the specified date range
- *       - Grouping: Group data by ServiceName and Region
- *       - Aggregation: Calculate total and average cost per group
- * 5. Sort the output by total cost (descending order).
- * 6. Print a summary showing the top cost-contributing services and regions.
- * 7. Convert the filtered and aggregated results into JSON format.
- * 8. Save the output files to:
- *       - anonymized_costs_filtered.json (filtered dataset)
- *       - summary_costs.json (aggregated results)
- *
- * Objective:
- * ----------
- * To perform NoSQL-style operations (selection, projection, filtering,
- * grouping, aggregation) using Groovy collections on Azure cloud cost data.
- * This exercise demonstrates how local data processing can reveal key
- * spending patterns without relying on external databases.
- *
- * Output:
- * --------
- * - anonymized_costs_filtered.json
- * - summary_costs.json
- * - Console summary of top services by total cost
- *
- * Learning Outcome:
- * -----------------
- * Demonstrate proficiency in data manipulation using Groovy collections.
- * Understand how Groovy can simulate NoSQL query operations for
- * analyzing cloud cost data locally.
- */
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVParser
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.text.SimpleDateFormat
+
+
+def file = new File("/Users/akshay/Documents/Projects/agile-cloud-automation-miniproject/app/src/main/resources/anonymized_costs.csv") //This points towards my csv
+def reader = file.newReader() //this opens the file for reading
+def csvdata = CSVParser.parse(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader()) //this parses the csv file and considers the first row as heading
+
+// This iterates through and creates a list for each row
+def csvmaps = csvdata.collect { row ->
+    [
+        Date: row.get("Date"),
+        ConsumedService: row.get("ConsumedService"),
+        ResourceLocation: row.get("ResourceLocation"),
+        CostInBillingCurrency: row.get("CostInBillingCurrency")
+    ]
+}
+
+// This converts the groovy objects into json and then parses it back to groovy objects
+def jsondata = JsonOutput.toJson(csvmaps)
+def conjson = new JsonSlurper().parseText(jsondata)
+
+
+def dateformat = new SimpleDateFormat("dd/MM/yyyy") // this specifies the date format like dd/mm/yyyy
+def startdate = dateformat.parse("22/12/2022") // this specifies the start date
+def enddate = dateformat.parse("22/01/2023") // this specifies the end date
+
+//findall filters the data between the specified dates and creates a new list pipeline
+def pipeline = conjson.findAll { row ->
+    def rowdate = dateformat.parse(row.Date)
+    rowdate >= startdate && rowdate <= enddate
+}.collect { row ->
+    [
+        Date: row.Date,
+        ServiceName: row.ConsumedService,
+        Region: row.ResourceLocation,
+        Cost: row.CostInBillingCurrency
+    ]
+}
+
+
+def groupeddata = pipeline.groupBy { row -> [row.ServiceName, row.Region] } //this groups the data by service name and region
+
+// this aggregates the total and average cost for each service and region
+def aggregateddata = groupeddata.collectEntries { key, rows ->
+    def totalcost = rows.sum { it.Cost.toBigDecimal() }  //big decimal represents decimal numbers and stores the digit exactly
+    def avgcost = totalcost / rows.size()
+    [key, [totalcost: totalcost, avgcost: avgcost]]
+}
+
+
+def sorteddata = aggregateddata.sort { -it.value.totalcost } //this sorts the data in descending order based on total cost
+def topservice = sorteddata.take(1)
+
+
+println "\n================== Aggregated Cost Summary =================="
+printf("%-30s %-20s %-15s %-15s\n", "Service Name", "Region", "Total Cost", "Average Cost")
+println "--------------------------------------------------------------------------"
+
+sorteddata.take(10).each { key, value ->
+    def (service, region) = key
+    printf("%-30s %-20s %-15.2f %-15.2f\n", service, region, value.totalcost, value.avgcost)
+}
+
+println "==========================================================================="
+println "\nTop Service by Cost: ${topservice}\n"
+
+
+def outputDir = new File("src/main/resources/output")
+if (!outputDir.exists()) outputDir.mkdirs() // create directory if missing
+
+def aggregatedjson = JsonOutput.toJson(aggregateddata) //converts objects back to json
+new File(outputDir, "summary_costs.json").write(JsonOutput.prettyPrint(aggregatedjson)) //this writes the jasond data to a file
+
+println "Aggregated summary saved successfully in ${outputDir.absolutePath}/summary_costs.json"

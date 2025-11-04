@@ -13,7 +13,13 @@ dependencies {
     implementation 'org.apache.groovy:groovy-xml:4.0.21'
     implementation 'org.mongodb:mongodb-driver-sync:5.1.0'
     implementation 'org.slf4j:slf4j-nop:2.0.9'
+    implementation 'org.apache.groovy:groovy-all:4.0.21'
+   // implementation 'org.codehaus.groovy:groovy-csv:1.3.6'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+
 }
+
+
 application {
     mainClass = 'DataPreparation_SplitAndUpload'
 }
