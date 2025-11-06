@@ -140,8 +140,8 @@ However, **MongoDB Atlas** demonstrates stronger scalability and stability due t
 ## 🔗 Project Resources
 | Resource | Description | Link |
 |-----------|--------------|------|
-| **GitHub Repository** | Full source code and documentation | [GitHub Link](https://github.com/YourUsername/agile-cloud-automation-miniproject) |
-| **Group Progress Tracker (Excel)** | Task allocation and weekly progress | [Excel Link](https://your-excel-link-here) |
+| **GitHub Repository** | Full source code and documentation | [GitHub Link](https://github.com/rbt3601/agile-cloud-automation-miniproject)) |
+| **Group Progress Tracker (Excel)** | Task allocation and weekly progress | [Excel Link](https://uniofleicester-my.sharepoint.com/:x:/r/personal/rbt3_student_le_ac_uk/Documents/Agile_Cloud_Automation_Team_Tracker.xlsx?d=w824157009eee486f8e26dcf19d35601c&csf=1&web=1&e=kgXYjt)) |
 
 ---
 
