@@ -1,168 +1,159 @@
-====================================================================
-☁️ CLOUD SERVICE COST ANALYSIS USING GROOVY AND MONGODB
-====================================================================
-Module: CO7217 – Agile Cloud Automation
-Course: MSc Cloud Computing, University of Leicester
-Academic Year: 2025–26
-====================================================================
+# ☁️ Cloud Service Cost Analysis using Groovy and MongoDB
 
-TEAM MEMBERS
--------------
-1. Akshay Nagaraj
-2. Anirudh Ramaprasad
-3. Shailesh Ravindra Dalvi
-4. Sayan Suhel Khan
-5. Honeykumar Ajitbhai Patel
-6. Rajesh Bennegere Theertheswara
+**Module:** CO7217 – Agile Cloud Automation  
+**Course:** MSc Cloud Computing, University of Leicester  
+**Academic Year:** 2025–26  
 
-====================================================================
-PROJECT OVERVIEW
-====================================================================
-This project analyses Azure Cloud Cost data using both local and 
-cloud-based environments. Groovy is used for local data processing, 
-while MongoDB Atlas is used for cloud aggregation. 
-The aim is to compare performance, scalability, and efficiency 
-across both environments using identical datasets.
+---
 
-====================================================================
-AIM
-====================================================================
-To analyse Azure cloud cost data using Groovy and MongoDB, showing 
-how services and regions contribute to overall spending and 
+## 👥 Team Members
+| Name |
+|------|
+| Akshay Nagaraj |
+| Anirudh Ramaprasad |
+| Shailesh Ravindra Dalvi |
+| Sayan Suhel Khan |
+| Honeykumar Ajitbhai Patel |
+| **Rajesh Bennegere Theertheswara** |
+
+---
+
+## 📘 Project Overview
+This project analyses **Azure Cloud Cost data** using both **local** and **cloud-based** environments.  
+Groovy is used for **local data processing**, while **MongoDB Atlas** is used for **cloud aggregation**.  
+The aim is to compare **performance, scalability, and efficiency** across both environments using identical datasets.
+
+---
+
+## 🎯 Aim
+To analyse Azure cloud cost data using Groovy and MongoDB,  
+showing how services and regions contribute to overall spending and  
 evaluating scalability between local and cloud environments.
 
-====================================================================
-EXERCISE SUMMARY
-====================================================================
-Exercise 1 - Dataset selection and planning
-Exercise 2 - Local data analysis using Groovy
-Exercise 3 - Cloud data analysis using MongoDB Atlas
-Exercise 4 - Comparison between local and cloud performance
-Exercise 5 - Scalability analysis (30K / 60K / 90K datasets)
+---
 
-====================================================================
-DATA SCHEMA (FIELDS USED)
-====================================================================
-Date, ConsumedService, ResourceLocation, CostInBillingCurrency
+## 🧩 Exercise Summary
+| Exercise | Description | Focus |
+|-----------|--------------|--------|
+| **Exercise 1** | Dataset selection and planning | Understanding and defining data scope |
+| **Exercise 2** | Local data analysis using Groovy | Local filtering, grouping, and aggregation |
+| **Exercise 3** | Cloud data analysis using MongoDB Atlas | Aggregation pipeline execution |
+| **Exercise 4** | Comparison between local and cloud | Performance & scalability evaluation |
+| **Exercise 5** | Scalability analysis (30K / 60K / 90K datasets) | Measuring data growth impact |
 
-Each record represents one Azure billing entry containing service, 
-region, and cost information.
+---
 
-====================================================================
-QUERY LOGIC (COMMON FOR ALL EXERCISES)
-====================================================================
-1. Selection  - Select Date, ServiceName, Region, Cost
-2. Filtering  - Records from 22 Dec 2022 to 22 Jan 2023
-3. Grouping   - Group by ServiceName and Region
-4. Aggregation- Compute total and average cost per group
-5. Sorting    - Descending order by total cost
-6. Limiting   - Display top 10 services by cost
+## 🧾 Data Schema (Fields Used)
+**Fields:**  
+`Date`, `ConsumedService`, `ResourceLocation`, `CostInBillingCurrency`
 
-====================================================================
-EXERCISE 2 – LOCAL DATA ANALYSIS (GROOVY)
-====================================================================
-Script: Exercise2.groovy
-Description:
-- Reads anonymized_costs.json files (30K, 60K, 90K)
-- Filters by date, groups by service & region
-- Computes total and average cost
-- Displays top 10 high-cost services
-- Saves JSON output to /resources/output/summary_costs.json
-- Measures execution time using System.nanoTime()
+Each record represents one Azure billing entry containing service, region, and cost information.
 
-Insight:
-Local Groovy analysis works well for small data but slows down 
-significantly for large datasets due to in-memory processing.
+---
 
-====================================================================
-EXERCISE 3 – CLOUD DATA ANALYSIS (MONGODB ATLAS)
-====================================================================
-Script: Exercise3.groovy
-Description:
-- Connects to MongoDB Atlas using mongo.properties credentials
-- Executes aggregation pipeline:
-  $addFields, $match, $group, $sort
-- Aggregates service and regional costs
-- Saves output to /resources/output/Exercise-3.json
-- Prints execution time and summary table
+## 🔍 Query Logic (Common for All Exercises)
+1. **Selection** – Select `Date`, `ServiceName`, `Region`, `Cost`  
+2. **Filtering** – Records from *22 Dec 2022 to 22 Jan 2023*  
+3. **Grouping** – Group by `ServiceName` and `Region`  
+4. **Aggregation** – Compute total and average cost per group  
+5. **Sorting** – Descending order by total cost  
+6. **Limiting** – Display top 10 services by cost  
 
-Insight:
-MongoDB Atlas performs faster and scales efficiently due to 
-server-side aggregation and distributed query execution.
+---
 
-====================================================================
-DATA PREPARATION SCRIPT
-====================================================================
-Script: DataPreparation_SplitUpload.groovy
-Description:
-- Reads anonymized_costs.csv (~96K records)
-- Converts CSV to JSON format
-- Splits data into three JSON files:
-  anonymized_costs_30.json (30K)
-  anonymized_costs_60.json (60K)
-  anonymized_costs_90.json (90K)
-- Uploads each dataset to MongoDB Atlas:
-  azurecosts_30, azurecosts_60, azurecosts_90
+## 💻 Exercise 2 – Local Data Analysis (Groovy)
+**Script:** `Exercise2.groovy`
 
-====================================================================
-EXERCISE 5 – SCALABILITY TEST AND ANALYSIS
-====================================================================
-Scripts:
-- Exercise5_1_LocalAnalysis.groovy  (Local Groovy test)
-- Exercise5_2_CloudAnalysis.groovy  (Cloud MongoDB test)
+### Description
+- Reads anonymized_costs JSON files (30K, 60K, 90K)  
+- Filters by date, groups by service & region  
+- Computes total and average cost  
+- Displays top 10 high-cost services  
+- Saves output to `src/main/resources/output/summary_costs.json`  
+- Measures execution time using `System.nanoTime()`  
 
-Datasets:
-30K / 60K / 90K JSON and Atlas collections
+### Insight
+Local Groovy analysis works well for small data but slows down significantly as dataset size increases due to in-memory computation.
 
-Description:
-- Measures total execution time for each dataset
-- Compares Groovy (local) vs MongoDB (cloud)
-- Stores execution summary in JSON output files
+---
 
-Observation:
-Execution time increases in both environments with dataset size,
-but MongoDB Atlas shows better scalability and stability due to 
-parallel processing and optimized aggregation.
+## ☁️ Exercise 3 – Cloud Data Analysis (MongoDB Atlas)
+**Script:** `Exercise3.groovy`
 
-====================================================================
-OUTPUT FILES
-====================================================================
-summary_costs.json                 - Local Aggregation Result
-Exercise-3.json                    - Cloud Aggregation Result
-local_scalability_summary.json     - Local Scalability Results
-cloud_scalability_summary.json     - Cloud Scalability Results
-upload_summary.json                - Data Upload Summary
+### Description
+- Connects to MongoDB Atlas using credentials in `mongo.properties`  
+- Executes aggregation pipeline with `$addFields`, `$match`, `$group`, `$sort`  
+- Aggregates service and regional costs  
+- Saves output as `Exercise-3.json`  
+- Displays results and total execution time  
 
-====================================================================
-PROJECT RESOURCES
-====================================================================
-GitHub Repository:
-https://github.com/YourUsername/agile-cloud-automation-miniproject
+### Insight
+MongoDB Atlas handles large-scale aggregations faster due to **server-side aggregation**, **parallel query execution**, and **auto-optimized indexing**.
 
-Group Progress Tracker (Excel):
-https://your-excel-link-here
+---
 
-====================================================================
-EXECUTION ORDER
-====================================================================
-1. DataPreparation_SplitUpload.groovy
-2. Exercise2.groovy
-3. Exercise3.groovy
-4. Exercise5_1_LocalAnalysis.groovy
-5. Exercise5_2_CloudAnalysis.groovy
+## 🧰 Data Preparation – `DataPreparation_SplitUpload.groovy`
+### Description
+- Reads `anonymized_costs.csv` (~96K records)  
+- Converts CSV to JSON format  
+- Splits data into:
+  - `anonymized_costs_30.json` (30K)  
+  - `anonymized_costs_60.json` (60K)  
+  - `anonymized_costs_90.json` (90K)  
+- Uploads each dataset to MongoDB Atlas collections:
+  - `azurecosts_30`  
+  - `azurecosts_60`  
+  - `azurecosts_90`
 
-====================================================================
-GRADLE EXECUTION COMMANDS
-====================================================================
-# Build project
-gradlew clean build
+---
 
-# Run a specific exercise
-gradlew run --args="src/main/groovy/Exercise2.groovy"
+## ⚡ Exercise 5 – Scalability Test and Analysis
+**Scripts:**
+- `Exercise5_1_LocalAnalysis.groovy` – Local analysis  
+- `Exercise5_2_CloudAnalysis.groovy` – Cloud analysis  
 
-(Or run directly using Groovy)
-groovy src/main/groovy/Exercise2.groovy
+**Datasets:**  
+30K / 60K / 90K (local JSON & MongoDB collections)
 
-====================================================================
-END OF FILE
-====================================================================
+### Description
+- Measures total execution time for each dataset  
+- Compares performance between Groovy (local) and MongoDB (cloud)  
+- Stores results as JSON summaries  
+
+### Observation
+Execution time increases in both environments with dataset size.  
+However, **MongoDB Atlas** demonstrates stronger scalability and stability due to **parallel aggregation** and **optimized performance**.
+
+---
+
+## 📊 Output Files
+| File | Description |
+|-------|--------------|
+| `summary_costs.json` | Local Aggregation Result |
+| `Exercise-3.json` | Cloud Aggregation Result |
+| `local_scalability_summary.json` | Local Scalability Summary |
+| `cloud_scalability_summary.json` | Cloud Scalability Summary |
+| `upload_summary.json` | Dataset Upload Log |
+
+---
+
+## 🔗 Project Resources
+| Resource | Description | Link |
+|-----------|--------------|------|
+| **GitHub Repository** | Full source code and documentation | [GitHub Link](https://github.com/YourUsername/agile-cloud-automation-miniproject) |
+| **Group Progress Tracker (Excel)** | Task allocation and weekly progress | [Excel Link](https://your-excel-link-here) |
+
+---
+
+## 🧭 Execution Order
+1. `DataPreparation_SplitUpload.groovy`  
+2. `Exercise2.groovy`  
+3. `Exercise3.groovy`  
+4. `Exercise5_1_LocalAnalysis.groovy`  
+5. `Exercise5_2_CloudAnalysis.groovy`
+
+---
+
+## ⚙️ Gradle Execution Commands
+```bash
+gradle run
