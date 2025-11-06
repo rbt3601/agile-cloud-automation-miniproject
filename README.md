@@ -3,7 +3,15 @@
 **Module:** CO7217 – Agile Cloud Automation  
 **Course:** MSc Cloud Computing, University of Leicester  
 **Academic Year:** 2025 – 26  
-**Team Members:** rbt3 (Lead), an448, ar719, srd22, ssk53, hap19
+## 👥 Team Members
+| Name |
+|------|
+| **Akshay Nagaraj** |
+| **Anirudh Ramaprasad** |
+| **Shailesh Ravindra Dalvi** |
+| **Sayan Suhel Khan** |
+| **Honeykumar Ajitbhai Patel** |
+|**Rajesh Bennegere Theertheswara** |
 
 ## 📘 Project Overview
 
@@ -150,13 +158,5 @@ To observe how execution time grows with dataset size in **local** and **cloud**
 
 
 
-## 👥 Team Members
-| Name |
-|------|
-| **Akshay** |
-| **Anirudh** |
-| **Shailesh** |
-| **Shyan** |
-| **Honey** |
-|**Rajesh** |
-<img width="2600" height="5821" alt="image" src="https://github.com/user-attachments/assets/f056a258-35d3-4792-9ad0-6d32d65c4b35" />
+
+
