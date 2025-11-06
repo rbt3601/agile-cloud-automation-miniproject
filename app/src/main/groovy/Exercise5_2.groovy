@@ -3,32 +3,39 @@ import org.bson.Document
 import java.text.SimpleDateFormat
 import groovy.json.JsonOutput
 
-// Created the properties object so that it could read key value pairs from the mongo.properties file
-def properties = new Properties()
+// =============================================================
+// Exercise 5_2 - Cloud Scalability Analysis (MongoDB Atlas)
+// Runs aggregation on azurecosts_30, azurecosts_60, azurecosts_90
+// =============================================================
 
-//Created the File object because we need to pass the mongo.properties file location so it points towards the actual mongo.properties file
-def propertiesFile = new File('src/main/resources/mongo.properties')
-// We are loading the mongo.properties file inside the properties object
+// Load credentials from mongo.properties
+def properties = new Properties()
+def propertiesFile = new File("src/main/resources/mongo.properties")
+if (!propertiesFile.exists()) {
+    println "mongo.properties file not found!"
+    System.exit(1)
+}
 propertiesFile.withInputStream { properties.load(it) }
 
-// Connecting to the mongoDB database using MongoClients.create method and passing the values from mongo.properties file
-def mongoClient = MongoClients.create(
-    "mongodb+srv://${properties.USN}:${properties.PWD}@${properties.SERVER}.mongodb.net/${properties.DB}?retryWrites=true&w=majority"
-)
-// Fetching the database object from the connected client
-def db  = mongoClient.getDatabase(properties.DB)
+// Build MongoDB URI
+def mongoUri = "mongodb+srv://${properties.USN}:${properties.PWD}@${properties.SERVER}.mongodb.net/${properties.DB}?retryWrites=true&w=majority"
 
-// Fetching the database collection object from the connected client
-def col = db.getCollection(properties.COLLECTION as String)
+// Connect to MongoDB
+def mongoClient = MongoClients.create(mongoUri)
+def db = mongoClient.getDatabase(properties.DB)
 
-println "database: ${db.getName()}"
-db.listCollectionNames().each { println it }
+println "\n Connected to MongoDB Atlas Database: ${db.getName()}"
+println "------------------------------------------------------------"
 
-/* Setting date logic for filtering the dataset */
-def sdf   = new SimpleDateFormat("MM/dd/yyyy")
+// MongoDB collections (datasets)
+def collections = ["azurecosts_30", "azurecosts_60", "azurecosts_90"]
+
+// Common date filter range
+def sdf = new SimpleDateFormat("MM/dd/yyyy")
 def start = sdf.parse("12/22/2022")
-def end   = sdf.parse("03/22/2023")
+def end = sdf.parse("03/22/2023")
 
+// Define common pipeline
 def addDate = new Document("\$addFields",
   new Document("parsedDate",
     new Document("\$dateFromString",
@@ -39,8 +46,7 @@ def addDate = new Document("\$addFields",
 def date_filteration = new Document("\$match",
   new Document("parsedDate", new Document("\$gte", start).append("\$lte", end))
 )
-
-def pipeLine_sortingByCost = [
+def pipeline = [
     addDate,
     date_filteration,
     new Document("\$project",
@@ -67,57 +73,90 @@ def pipeLine_sortingByCost = [
     new Document("\$limit", 10)
 ]
 
+// Store overall results for summary
+def summaryResults = []
 
-//---------------------------------------------
-// 🕒 Step: Measure Aggregation Execution Time
-//---------------------------------------------
-println "\n▶ Running MongoDB Aggregation Pipeline..."
-def startTime = System.nanoTime()
+// =============================================================
+// Run aggregation for each collection
+// =============================================================
+collections.each { cname ->
+    println "\n------------------------------------------------------------"
+    println "Running Aggregation on Collection: ${cname}"
+    println "------------------------------------------------------------"
 
-def aggResults = []
-col.aggregate(pipeLine_sortingByCost).into(aggResults)
+    def col = db.getCollection(cname)
 
-def endTime = System.nanoTime()
-def elapsedTime = (endTime - startTime) / 1_000_000_000.0
-//---------------------------------------------
+    // Count total documents in this collection
+    def totalDocs = col.countDocuments()
+    println "📦 Records in ${cname}: ${totalDocs}"
 
-//Printing formatted table header
-println "ServiceName                   | Region        | TotalCost      | AverageCost    | Count"
-println "------------------------------------------------------------------------------------------"
+    // Start timer
+    def startTime = System.nanoTime()
+    def aggResults = []
+    col.aggregate(pipeline).into(aggResults)
+    def endTime = System.nanoTime()
+    def elapsed = (endTime - startTime) / 1_000_000_000.0
 
-aggResults.each { d ->
-    def k = d.get("_id") as Document
-    def svc = (k.get("ServiceName") ?: "").toString()
-    def reg = (k.get("Region") ?: "").toString()
-    def tot = (d.get("TotalCost") as Number).doubleValue()
-    def avg = (d.get("AverageCost") as Number).doubleValue()
-    def cnt = d.get("Count")
-    println "${svc.padRight(28)} | ${reg.padRight(12)} | ${String.format('%.6f', tot).padRight(13)} | ${String.format('%.6f', avg).padRight(13)} | ${cnt}"
+    // Print output table
+    println "\n================== Aggregated Cost Summary =================="
+    printf("%-30s %-20s %-15s %-15s\n", "Service Name", "Region", "Total Cost", "Average Cost")
+    println "--------------------------------------------------------------------------"
+    aggResults.each { d ->
+        def k = d.get("_id") as Document
+        def svc = (k.get("ServiceName") ?: "").toString()
+        def reg = (k.get("Region") ?: "").toString()
+        def tot = (d.get("TotalCost") as Number).doubleValue()
+        def avg = (d.get("AverageCost") as Number).doubleValue()
+        printf("%-30s %-20s %-15.2f %-15.2f\n", svc, reg, tot, avg)
+    }
+
+    // Get top service
+    def top = aggResults[0]
+    def topService = top?._id?.ServiceName ?: "N/A"
+    def topRegion = top?._id?.Region ?: "N/A"
+    def topTotal = top?.TotalCost ?: 0
+
+    println "==========================================================================="
+    println String.format("Top Service: %s (%s) - Total Cost: %.2f", topService, topRegion, topTotal)
+    println String.format("Execution Time for %s: %.3f seconds", cname, elapsed)
+    println "==========================================================================="
+
+    // Save output to JSON
+    def outDir = new File("src/main/resources/output")
+    if (!outDir.exists()) outDir.mkdirs()
+    def outFile = new File(outDir, "cloud_summary_${cname}.json")
+    outFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(aggResults))
+
+    // Add result to summary list
+    summaryResults << [
+        Collection: cname,
+        Documents: totalDocs,
+        TopService: topService,
+        Region: topRegion,
+        TotalCost: String.format("%.2f", topTotal),
+        ExecutionTimeSec: String.format("%.3f", elapsed)
+    ]
 }
 
-//Here we are extracting the same output in JSON format and saving it into a file
-def rows = aggResults.collect { d ->
-    def k = d.get("_id") as Document
-    def svc = (k.get("ServiceName") ?: "").toString()
-    def reg = (k.get("Region") ?: "").toString()
-    def tot = (d.get("TotalCost") as Number).doubleValue()
-    def avg = (d.get("AverageCost") as Number).doubleValue()
-    def cnt = d.get("Count")
-    [ServiceName: svc, Region: reg, TotalCost: tot, AverageCost: avg, Count: cnt]
+// =============================================================
+// Print overall scalability summary
+// =============================================================
+println "\n================== CLOUD SCALABILITY SUMMARY =================="
+printf("%-20s %-12s %-25s %-15s %-15s %-15s\n",
+       "Collection", "Records", "Top Service", "Region", "Total Cost", "Exec Time(s)")
+println "-------------------------------------------------------------------------------------------"
+summaryResults.each { r ->
+    printf("%-20s %-12d %-25s %-15s %-15s %-15s\n",
+           r.Collection, r.Documents, r.TopService, r.Region, r.TotalCost, r.ExecutionTimeSec)
 }
+println "==========================================================================================="
 
-def outDir = new File("${System.getProperty('user.dir')}/src/main/resources/output")
-outDir.mkdirs()
-def jsonFile = new File(outDir, "Exercise-3.json")
-jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(rows))
+// Save summary JSON file
+def summaryFile = new File("src/main/resources/output/cloud_scalability_summary.json")
+summaryFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(summaryResults))
 
-//---------------------------------------------
-// ⏱️ Step: Print Aggregation Time Summary
-//---------------------------------------------
-println "\n==========================================================================="
-println String.format("✅ MongoDB Aggregation Completed in %.3f seconds", elapsedTime)
-println "==========================================================================="
+println "\n Cloud scalability summary saved in: ${summaryFile.absolutePath}"
 
-// Close connection
+// Close MongoDB connection
 mongoClient.close()
-println "Mongo client closed"
+println "\n Mongo client closed successfully."
