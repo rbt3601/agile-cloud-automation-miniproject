@@ -3,7 +3,13 @@ import com.mongodb.client.*
 import org.bson.Document
 import java.util.Properties
 
-//Load credentials from properties file
+// ===========================================
+// Data Preparation and Upload Script
+// Splits CSV into 3 JSON subsets (30K, 60K, 90K)
+// and uploads them into MongoDB Atlas.
+// ===========================================
+
+// ✅ Load credentials from properties file
 def credFile = new File("src/main/resources/mongo.properties")
 def cred = new Properties()
 
@@ -12,75 +18,109 @@ if (!credFile.exists()) {
     System.exit(1)
 }
 
-// Load the properties
 credFile.withInputStream { cred.load(it) }
 
-//Extract credentials
 def usn = cred.getProperty("USN")
 def pwd = cred.getProperty("PWD")
 def server = cred.getProperty("SERVER")
 def dbName = cred.getProperty("DB")
-def collectionName = cred.getProperty("COLLECTION")
 
-//Construct MongoDB URI dynamically
+// Construct MongoDB URI
 def mongoUri = "mongodb+srv://${usn}:${pwd}@${server}.mongodb.net/?retryWrites=true&w=majority"
 
-
-//Define dataset input/output paths
+// Define input and output paths
 def INPUT_CSV = "src/main/resources/anonymized_costs.csv"
-def OUTPUT_JSON = "src/main/resources/anonymized_costs_90.json"
+def OUTPUT_DIR = "src/main/resources"
 
-//Read and convert CSV to JSON (first 40,000 records)
+// ===========================================
+// STEP 1️: Read CSV file
+// ===========================================
 def file = new File(INPUT_CSV)
 if (!file.exists()) {
     println "CSV file not found at: ${file.absolutePath}"
     System.exit(1)
 }
 
-println "Reading CSV file..."
+println "\n Reading CSV file..."
 def reader = file.newReader("UTF-8")
 def header = reader.readLine()?.split(",")
-def dataList = []
+def allData = []
 
-int lineCount = 0
 reader.eachLine { line ->
-    if (lineCount >= 90000) return
-    if (lineCount > 0) {
-        def values = line.split(",")
+    def values = line.split(",")
+    if (values.size() == header.size()) {
         def record = [:]
         for (int i = 0; i < header.size(); i++) {
             record[header[i].trim()] = values[i]?.trim()
         }
-        dataList << record
+        allData << record
     }
-    lineCount++
 }
 reader.close()
+println "Total records loaded from CSV: ${allData.size()}"
 
-println "Loaded ${dataList.size()} records from CSV."
+// ===========================================
+// STEP 2️: Split into subsets (30K, 60K, 90K)
+// ===========================================
+def subsets = [
+    [name: "30", size: 30000],
+    [name: "60", size: 60000],
+    [name: "90", size: 90000]
+]
 
-// ✅ Step 6: Write subset to JSON file
-println "Writing subset to JSON file..."
-def jsonContent = JsonOutput.prettyPrint(JsonOutput.toJson(dataList))
-new File(OUTPUT_JSON).write(jsonContent, "UTF-8")
-println "JSON file created: ${OUTPUT_JSON}"
+def jsonFiles = []
 
-// ✅ Step 7: Upload data to MongoDB Atlas
-println "\n Connecting to MongoDB Atlas and uploading data..."
+subsets.each { subset ->
+    def subsetData = allData.take(subset.size)
+    def outputFile = new File("${OUTPUT_DIR}/anonymized_costs_${subset.name}.json")
+    def jsonContent = JsonOutput.prettyPrint(JsonOutput.toJson(subsetData))
+    outputFile.write(jsonContent, "UTF-8")
+    jsonFiles << [name: subset.name, file: outputFile, data: subsetData]
+    println "JSON file created: ${outputFile.name} with ${subsetData.size()} records"
+}
+
+// ===========================================
+// STEP 3️: Upload each subset to MongoDB
+// ===========================================
+println "\n Connecting to MongoDB Atlas..."
 try {
     def mongoClient = MongoClients.create(mongoUri)
     def database = mongoClient.getDatabase(dbName)
-    def collection = database.getCollection(collectionName)
 
-    println "Uploading records to collection '${collectionName}'..."
-    def documents = dataList.collect { new Document(it) }
+    jsonFiles.each { subset ->
+        def collectionName = "azurecosts_${subset.name}"
+        def collection = database.getCollection(collectionName)
+        println "\n Uploading ${subset.data.size()} records to collection '${collectionName}'..."
 
-    collection.insertMany(documents)
-    println "Successfully uploaded ${documents.size()} records to MongoDB Atlas."
+        collection.drop() // clear old data if present
+        def documents = subset.data.collect { new Document(it) }
+        collection.insertMany(documents)
+
+        println "Successfully uploaded ${documents.size()} records to ${collectionName}"
+    }
 
     mongoClient.close()
+    println "\n All uploads completed successfully!"
 } catch (Exception e) {
     println "Error during MongoDB upload: ${e.message}"
 }
 
-println "\n Task completed successfully!"
+// ===========================================
+// STEP 4️: Create upload summary file
+// ===========================================
+def summary = jsonFiles.collect {
+    [
+        FileName: it.file.name,
+        Records: it.data.size(),
+        MongoCollection: "azurecosts_${it.name}"
+    ]
+}
+
+def summaryFile = new File("${OUTPUT_DIR}/output/upload_summary.json")
+if (!summaryFile.parentFile.exists()) summaryFile.parentFile.mkdirs()
+summaryFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(summary))
+
+println "\n Upload Summary saved to: ${summaryFile.absolutePath}"
+println "==========================================================="
+println " Task Completed Successfully"
+println "==========================================================="
